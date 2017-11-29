@@ -339,7 +339,8 @@ class CycleCrossover(object):
         for i in range(0, len(parent_row)):
             if(parent_row[i] == value):
                 return i
-            
+
+
 class Sudoku(object):
     """ Solves a given Sudoku puzzle using a genetic algorithm. """
 
@@ -382,11 +383,19 @@ class Sudoku(object):
             print("Generation %d" % generation)
             
             # Check for a solution.
+            best_fitness = 0.0
             for c in range(0, Nc):
-                if(self.population.candidates[c].fitness == 1):
+                fitness = self.population.candidates[c].fitness
+                if(fitness == 1):
                     print("Solution found at generation %d!" % generation)
                     print(self.population.candidates[c].values)
                     return self.population.candidates[c]
+
+                # Find the best fitness.
+                if(fitness > best_fitness):
+                    best_fitness = fitness
+
+            print("Best fitness: %f" % best_fitness)
 
             # Create the next population.
             next_population = []
