@@ -30,7 +30,7 @@ class Population(object):
                         # Value is available.
                         helper.values[row][column].append(value)
                     elif(given.values[row][column] != 0):
-                        # Value is a given.
+                        # Given/known value from file.
                         helper.values[row][column].append(given.values[row][column])
                         break
 
