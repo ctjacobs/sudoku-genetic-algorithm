@@ -18,9 +18,12 @@ def sort_fitness(x, y):
         return -1
             
 class Population(object):
-    def __init__(self, Np, given):
-        self.candidates = []  # The candidate solutions (also known as the chromosomes) in the population.
+    def __init__(self):
+        return
 
+    def seed(self, Np, given):
+        self.candidates = []  # The candidate solutions (also known as the chromosomes) in the population.
+        
         # Determine the legal values that each square can take.
         helper = Candidate()
         helper.values = [[[] for j in range(0, Nd)] for i in range(0, Nd)]
@@ -118,7 +121,7 @@ class Candidate(object):
             
         return fitness
         
-    def mutate(self, mutation_rate):
+    def mutate(self, mutation_rate, given):
         """ Mutate a candidate. """
 
         r = random.uniform(0, 1.1)
@@ -139,12 +142,12 @@ class Candidate(object):
                     to_column = random.randint(0, 8)   
 
                 # Check if the two places are free...
-                if(self.given.values[row1][from_column] == 0 and self.given.values[row1][to_column] == 0):
+                if(given.values[row1][from_column] == 0 and given.values[row1][to_column] == 0):
                     # ...and that we are not causing a duplicate in the rows' columns.
-                    if(not self.given.is_column_duplicate(to_column, self.values[row1][from_column])
-                       and not self.given.is_column_duplicate(from_column, self.values[row2][to_column])
-                       and not self.given.is_block_duplicate(row2, to_column, self.values[row1][from_column])
-                       and not self.given.is_block_duplicate(row1, from_column, self.values[row2][to_column])):
+                    if(not given.is_column_duplicate(to_column, self.values[row1][from_column])
+                       and not given.is_column_duplicate(from_column, self.values[row2][to_column])
+                       and not given.is_block_duplicate(row2, to_column, self.values[row1][from_column])
+                       and not given.is_block_duplicate(row1, from_column, self.values[row2][to_column])):
                     
                         # Swap values.
                         temp = self.values[row2][to_column]
@@ -233,17 +236,22 @@ class Sudoku(object):
         return
     
     def solve(self):
-        Np = 10
-        Ne = 2
-        Ng = 2
-        Nm = 0
-        mutation_rate = 0
+        Np = 10  # Population size.
+        Ne = 2  # Number of elites.
+        Ng = 2  # Number of generations.
+        Nm = 0  # Number of mutations.
+        
+        # Mutation parameters.
+        phi = 0
+        sigma = 1
+        mutation_rate = 0.06
     
         # Create an initial population.
-        self.population = Population(Np, self.given)
+        self.population = Population()
+        self.population.seed(Np, self.given)
     
         # For up to 10000 generations...
-        generations_without_change = 0
+        stale = 0
         for generation in range(0, Ng):
             
             # Check for a solution.
@@ -271,13 +279,26 @@ class Sudoku(object):
                 parent2 = t.compete(self.population.candidates)
                 
                 ## Cross-over.
-                child1, child2 = CycleCrossover(parent1, parent2)
+                #child1, child2 = CycleCrossover(parent1, parent2)
+                import copy
+                child1 = copy.deepcopy(parent1)
+                child2 = copy.deepcopy(parent2)
                 
-                # Mutate
-                old_fitness = self.fitness
-                success = child1.mutate(mutation_rate)
+                # Mutate child1.
+                old_fitness = child1.fitness
+                success = child1.mutate(mutation_rate, self.given)
                 if(success):
                     Nm += 1
+                    if(child1.fitness > old_fitness):  # Used to calculate the relative success rate of mutations
+                        phi = phi + 1
+                
+                # Mutate child2.
+                old_fitness = child2.fitness
+                success = child2.mutate(mutation_rate, self.given)
+                if(success):
+                    Nm += 1
+                    if(child2.fitness > old_fitness):  # Used to calculate the relative success rate of mutations
+                        phi = phi + 1
                 
                 ## Add children to new population
                 next_population.append(child1)
@@ -289,7 +310,7 @@ class Sudoku(object):
             
             
             # Select next generation.
-            self.population = next_population
+            self.population.candidates = next_population
             
             # Calculate new adaptive mutation rate (based on Rechenberg's 1/5 success rule).
             if(Nm == 0):
@@ -303,6 +324,24 @@ class Sudoku(object):
                 sigma = sigma*0.998
 
             mutation_rate = abs(numpy.random.normal(loc=0.0, scale=sigma, size=None))
+        
+            # Check for stale population.
+            self.population.sort()
+            if(self.population.candidates[0].fitness != self.population.candidates[1].fitness):
+                stale = 0
+            else:
+                stale += 1
+
+            # Kill off the population if 100 generations have passed without a change in their best fitness.
+            if(stale >= 100):
+                print "Earth Quake!"
+                self.population.seed(Np, self.given)
+                stale = 0
+                sigma = 1
+                phi = 0
+                mutations = 0
+                mutation_rate = 0.06
+        
         
 s = Sudoku()
 s.load("puzzle.txt")
