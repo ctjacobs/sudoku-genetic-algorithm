@@ -94,7 +94,7 @@ class Candidate(object):
     """ A candidate solutions to the Sudoku puzzle. """
 
     def __init__(self):
-        self.values = numpy.zeros((Nd, Nd))
+        self.values = numpy.zeros((Nd, Nd), dtype='uint8')
         self.fitness = None
         return
 
@@ -358,7 +358,6 @@ class Sudoku(object):
         # Load a configuration to solve.
         with open(path, "r") as f:
             values = numpy.loadtxt(f).reshape((Nd, Nd)).astype(int)
-            print(type(values[0][0]))
             self.given = Given(values)
         return
 
