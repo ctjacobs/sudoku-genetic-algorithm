@@ -286,7 +286,7 @@ class CycleCrossover(object):
         child_row1 = numpy.zeros(Nd)
         child_row2 = numpy.zeros(Nd)
 
-        remaining = range(1, Nd + 1)
+        remaining = list(range(1, Nd + 1))
         cycle = 0
 
         while((0 in child_row1) and (0 in child_row2)):  # While child rows not complete...
@@ -417,6 +417,7 @@ class Sudoku(object):
                 child1, child2 = cc.crossover(parent1, parent2, crossover_rate=1.0)
 
                 # Mutate child1.
+                child1.update_fitness()
                 old_fitness = child1.fitness
                 success = child1.mutate(mutation_rate, self.given)
                 child1.update_fitness()
@@ -427,6 +428,7 @@ class Sudoku(object):
                         phi = phi + 1
 
                 # Mutate child2.
+                child2.update_fitness()
                 old_fitness = child2.fitness
                 success = child2.mutate(mutation_rate, self.given)
                 child2.update_fitness()
