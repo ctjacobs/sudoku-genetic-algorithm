@@ -485,7 +485,9 @@ class Sudoku(object):
 
 
 s = Sudoku()
-s.load("puzzle_mild.txt")
+filename = input("Enter the input filename: ")
+s.load(filename)
 solution = s.solve()
 if(solution):
-    s.save("solution.txt", solution)
+    filename = ''.join(filename.split('.')[:-1] + ['_ans.txt'])
+    s.save(filename, solution)
