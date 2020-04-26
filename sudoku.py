@@ -114,7 +114,7 @@ class Candidate(object):
 
         for i in range(0, Nd):  # For each column...
             for j in range(0, Nd):  # For each number within it...
-                column_count[self.values[j][i]-1] += 1  # ...Update list with occurrence
+                column_count[self.values[j][i]-1] += 1  # ...Update list with occurrence of a particular number.
 
             column_sum += (1.0 / len(set(column_count)))/Nd
             column_count = numpy.zeros(Nd)
