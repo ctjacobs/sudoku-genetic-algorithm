@@ -98,17 +98,27 @@ class Candidate(object):
     def update_fitness(self):
         """ The fitness of a candidate solution is determined by how close it is to being the actual solution to the puzzle. The actual solution (i.e. the 'fittest') is defined as a 9x9 grid of numbers in the range [1, 9] where each row, column and 3x3 block contains the numbers [1, 9] without any duplicates (see e.g. http://www.sudoku.com/); if there are any duplicates then the fitness will be lower. """
         
+        row_count = numpy.zeros(Nd)
         column_count = numpy.zeros(Nd)
         block_count = numpy.zeros(Nd)
+        row_sum = 0
         column_sum = 0
         block_sum = 0
 
-        for i in range(0, Nd):  # For each column...
-            for j in range(0, Nd):  # For each number within the current column...
-                column_count[self.values[i][j]-1] += 1  # ...Update list with occurrence of a particular number.
+        for i in range(0, Nd):  # For each row...
+            for j in range(0, Nd):  # For each number within it...
+                row_count[self.values[i][j]-1] += 1  # ...Update list with occurrence of a particular number.
 
-            column_sum += (1.0/len(set(column_count)))/Nd
+            row_sum += (1.0/len(set(row_count)))/Nd
+            row_count = numpy.zeros(Nd)
+
+        for i in range(0, Nd):  # For each column...
+            for j in range(0, Nd):  # For each number within it...
+                column_count[self.values[j][i]-1] += 1  # ...Update list with occurrence
+
+            column_sum += (1.0 / len(set(column_count)))/Nd
             column_count = numpy.zeros(Nd)
+
 
         # For each block...
         for i in range(0, Nd, 3):
@@ -129,7 +139,7 @@ class Candidate(object):
                 block_count = numpy.zeros(Nd)
 
         # Calculate overall fitness.
-        if (int(column_sum) == 1 and int(block_sum) == 1):
+        if (int(row_sum) == 1 and int(column_sum) == 1 and int(block_sum) == 1):
             fitness = 1.0
         else:
             fitness = column_sum * block_sum
