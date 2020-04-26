@@ -91,7 +91,7 @@ class Population(object):
 class Candidate(object):
     """ A candidate solutions to the Sudoku puzzle. """
     def __init__(self):
-        self.values = numpy.zeros((Nd, Nd))
+        self.values = numpy.zeros((Nd, Nd), dtype=int)
         self.fitness = None
         return
 
