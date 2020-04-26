@@ -1,4 +1,4 @@
-""" Solves a Sudoku puzzle using a genetic algorithm. This is an improved version of a piece of coursework produced by Christian Thomas Jacobs as part of the CS3M6 Evolutionary Computation module at the University of Reading.
+""" Solves a Sudoku puzzle using a genetic algorithm. This is based on a piece of coursework produced by Christian Thomas Jacobs as part of the CS3M6 Evolutionary Computation module at the University of Reading.
 
 Copyright (c) 2009, 2017 Christian Thomas Jacobs
 """
