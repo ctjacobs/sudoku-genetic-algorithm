@@ -372,7 +372,7 @@ class Sudoku(object):
         return
         
     def solve(self):
-        Nc = 100  # Number of candidates (i.e. population size).
+        Nc = 1000  # Number of candidates (i.e. population size).
         Ne = int(0.05*Nc)  # Number of elites.
         Ng = 1000  # Number of generations.
         Nm = 0  # Number of mutations.
@@ -471,7 +471,9 @@ class Sudoku(object):
                 sigma = sigma*0.998
 
             mutation_rate = abs(numpy.random.normal(loc=0.0, scale=sigma, size=None))
-        
+            Nm = 0
+            phi = 0
+
             # Check for stale population.
             self.population.sort()
             if(self.population.candidates[0].fitness != self.population.candidates[1].fitness):
@@ -486,7 +488,7 @@ class Sudoku(object):
                 stale = 0
                 sigma = 1
                 phi = 0
-                mutations = 0
+                Nm = 0
                 mutation_rate = 0.06
         
         print("No solution found.")
